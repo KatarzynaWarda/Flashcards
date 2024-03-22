@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val addingFileUiData = AddingFileUiData(newTerm = "", newDefinition = "", glossaryName = "", glossaryEntry = GlossaryEntry("",""), glossary = Glossary("", listOf()))
+        val addingFileUiData = AddingFileUiData(glossaryEntry = GlossaryEntry("",""), glossary = Glossary("", listOf()))
 
         val factory = Factory(addingFileUiData)
         val vm: FlashcardsViewModel by viewModels { factory }

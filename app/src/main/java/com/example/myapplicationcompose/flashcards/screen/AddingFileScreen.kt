@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.IconButton
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplicationcompose.R
 import com.example.myapplicationcompose.flashcards.data.Glossary
+import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 import com.example.myapplicationcompose.ui.theme.Pink80
 import com.example.myapplicationcompose.ui.theme.Purple80
@@ -41,9 +43,10 @@ import com.example.myapplicationcompose.ui.theme.PurpleGrey80
 @Composable
 fun AddingFileScreen(
     viewModel: FlashcardsViewModel,
+    glossaryEntry: GlossaryEntry,
     addFileOnClick : (String) -> Unit,
 ) {
-    val glossaryName by viewModel.glossaryName.collectAsState()
+    val glossary by viewModel.glossary.collectAsState()
 
     Box(
         modifier = Modifier
@@ -53,7 +56,7 @@ fun AddingFileScreen(
     ) {
         Column {
             TextField(
-                value = glossaryName,
+                value = glossary.name,
                 onValueChange = { newName ->
                     viewModel.updateGlossaryName(newName)
                 },
@@ -63,18 +66,29 @@ fun AddingFileScreen(
                     .defaultMinSize(20.dp)
             )
             Spacer(modifier = Modifier.height(30.dp))
-            GlossaryScreen(viewModel = viewModel)
-
+            LazyColumn {
+                itemsIndexed(glossary.entries) { index, entry ->
+                    GlossaryScreen(viewModel = viewModel, onEntryChange = { updatedEntry ->
+                        glossary.entries[index] = updatedEntry
+                        if (index == glossary.entries.size - 1 && entry.definition.isNotBlank()) {
+                            glossary.entries.add(glossaryEntry())
+                        }
+                    })
+                }
+            }
         }
         IconButton(
             onClick = {
-                viewModel.updateGlossaryEntry(viewModel.term.value, viewModel.definition.value)
-                addFileOnClick(glossaryName)},
+                viewModel.updateGlossary()
+                addFileOnClick(glossary.name) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(80.dp)
                 .background(Color.DarkGray, RoundedCornerShape(100.dp))
-                .border(BorderStroke(2.dp, colorResource(id = R.color.blue)), RoundedCornerShape(100.dp)),
+                .border(
+                    BorderStroke(2.dp, colorResource(id = R.color.blue)),
+                    RoundedCornerShape(100.dp)
+                ),
         ) {
             Image(
                 painter = painterResource(id = R.drawable.icons8_done_52),

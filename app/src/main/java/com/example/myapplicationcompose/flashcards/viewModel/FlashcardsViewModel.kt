@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplicationcompose.flashcards.data.AddingFileUiData
 import com.example.myapplicationcompose.flashcards.data.Glossary
 import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,49 +13,41 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-import javax.inject.Named
 
 class FlashcardsViewModel @Inject constructor(
     private val addingFileUiData: AddingFileUiData,
 ) : ViewModel() {
 
-    private val _term = MutableStateFlow(addingFileUiData.newTerm)
-    val term = _term.asStateFlow()
-
-    private val _definition = MutableStateFlow(addingFileUiData.newDefinition)
-    val definition = _definition.asStateFlow()
-
-    private val _glossaryName = MutableStateFlow(addingFileUiData.glossaryName)
-    val glossaryName = _glossaryName.asStateFlow()
-
-    private val _glossaryEntry = MutableStateFlow(addingFileUiData.glossaryEntry)
-    val glossaryEntry = _glossaryEntry.asStateFlow()
+    private val _glossaryEntry = MutableStateFlow(addingFileUiData.glossary.entries)
+    val glossaryEntries: StateFlow<List<GlossaryEntry>> = _glossaryEntry.asStateFlow()
 
     private val _glossary = MutableStateFlow(addingFileUiData.glossary)
     val glossary = _glossary.asStateFlow()
 
-    private val _temporaryEntries = MutableStateFlow<List<GlossaryEntry>>(listOf())
-
-    fun updateTerm(term: String){
-        _term.value = term
-    }
-
-    fun updateDefinition(definition: String){
-        _definition.value = definition
-    }
-
     fun updateGlossaryName(name: String){
-        _glossaryName.value = name
+        val currentName = _glossary.value
+        _glossary.value = currentName.copy(name = name)
     }
 
-    fun updateGlossaryEntry(term: String, definition: String) {
-        val newEntry = GlossaryEntry(term, definition)
-        _temporaryEntries.value = _temporaryEntries.value + newEntry
-        updateGlossary()
+    fun updateGlossaryEntry(
+        term: String,
+        definition: String,
+        index: Int,
+        updatedEntry: GlossaryEntry
+    ) {
+        val updatedList = _glossaryEntry.value.toMutableList().apply {
+            this[index] = updatedEntry
+        }
+
+        if (index == _glossaryEntry.value.size - 1 && updatedEntry.definition.isNotBlank()) {
+            updatedList.add(GlossaryEntry(term, definition))
+        }
+
+        _glossaryEntry.value = updatedList
     }
 
     fun updateGlossary() {
-        _glossary.value = Glossary(_glossaryName.value, _temporaryEntries.value)
+        _glossary.value = Glossary(_glossary.value.name, _glossaryEntry.value)
     }
 
     fun fromFirstScreenToAddingFileScreen(navigateToAddingFileScreenAction: () -> Unit){
@@ -64,7 +55,7 @@ class FlashcardsViewModel @Inject constructor(
     }
 
     fun addFileOnClick(navigateToFlashcardsScreenAction: (String) -> Unit){
-        navigateToFlashcardsScreenAction(_glossaryName.value)
+        navigateToFlashcardsScreenAction(_glossary.value.name)
     }
 
     fun getGlossaryByName(name: String): StateFlow<Glossary?> {

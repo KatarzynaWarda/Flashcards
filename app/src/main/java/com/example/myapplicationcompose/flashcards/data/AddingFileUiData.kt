@@ -1,9 +1,6 @@
 package com.example.myapplicationcompose.flashcards.data
 
 data class AddingFileUiData(
-    val newTerm : String,
-    val newDefinition : String,
-    val glossaryName: String,
     val glossaryEntry : GlossaryEntry,
     val glossary: Glossary,
 )
