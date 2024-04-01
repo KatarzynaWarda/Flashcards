@@ -5,6 +5,6 @@ data class AddingFileUiData(
     val glossary: Glossary,
 )
 
-data class GlossaryEntry(val term: String, val definition: String)
+data class GlossaryEntry(var term: String, var definition: String)
 
 data class Glossary(val name: String, val entries: List<GlossaryEntry>)

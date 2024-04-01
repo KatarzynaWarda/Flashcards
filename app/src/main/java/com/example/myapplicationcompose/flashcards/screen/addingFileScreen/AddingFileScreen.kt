@@ -1,4 +1,4 @@
-package com.example.myapplicationcompose.flashcards.screen
+package com.example.myapplicationcompose.flashcards.screen.addingFileScreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -13,18 +13,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,20 +34,21 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplicationcompose.R
-import com.example.myapplicationcompose.flashcards.data.Glossary
 import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
-import com.example.myapplicationcompose.ui.theme.Pink80
-import com.example.myapplicationcompose.ui.theme.Purple80
-import com.example.myapplicationcompose.ui.theme.PurpleGrey80
 
 @Composable
 fun AddingFileScreen(
     viewModel: FlashcardsViewModel,
-    glossaryEntry: GlossaryEntry,
     addFileOnClick : (String) -> Unit,
 ) {
     val glossary by viewModel.glossary.collectAsState()
+    val entriesDraft = remember { mutableStateListOf<GlossaryEntry>() }
+    val itemsCount = remember { mutableStateOf(1) }
+
+    while (entriesDraft.size < itemsCount.value) {
+        entriesDraft.add(GlossaryEntry("", ""))
+    }
 
     Box(
         modifier = Modifier
@@ -67,19 +69,23 @@ fun AddingFileScreen(
             )
             Spacer(modifier = Modifier.height(30.dp))
             LazyColumn {
-                itemsIndexed(glossary.entries) { index, entry ->
-                    GlossaryScreen(viewModel = viewModel, onEntryChange = { updatedEntry ->
-                        glossary.entries[index] = updatedEntry
-                        if (index == glossary.entries.size - 1 && entry.definition.isNotBlank()) {
-                            glossary.entries.add(glossaryEntry())
+                itemsIndexed(entriesDraft) { index, draft ->
+                    GlossaryScreen(
+                        onEntryChange = { term, definition ->
+                            entriesDraft[index] = draft.copy(term = term, definition = definition)
                         }
-                    })
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
                 }
             }
         }
         IconButton(
             onClick = {
+                entriesDraft.forEach { draft ->
+                    viewModel.updateGlossaryEntry(draft.term, draft.definition)
+                }
                 viewModel.updateGlossary()
+                viewModel.glossaries.add(glossary)
                 addFileOnClick(glossary.name) },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -99,7 +105,14 @@ fun AddingFileScreen(
             )
         }
     }
+    LaunchedEffect(entriesDraft.last()) {
+        if (entriesDraft.last().term.isNotBlank() && entriesDraft.last().definition.isNotBlank()) {
+            itemsCount.value = entriesDraft.size + 1
+        }
+    }
+
 }
+
 
 //@Preview
 //@Composable

@@ -1,4 +1,4 @@
-package com.example.myapplicationcompose.flashcards.screen
+package com.example.myapplicationcompose.flashcards.screen.flashardsScreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi

@@ -1,15 +1,11 @@
 package com.example.myapplicationcompose.flashcards.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplicationcompose.flashcards.screen.AddingFileScreen
-import com.example.myapplicationcompose.flashcards.screen.FirstScreen
-import com.example.myapplicationcompose.flashcards.screen.FlashcardsScreen
+import com.example.myapplicationcompose.flashcards.screen.addingFileScreen.AddingFileScreen
+import com.example.myapplicationcompose.flashcards.screen.mainScreen.FirstScreen
 import com.example.myapplicationcompose.flashcards.screen.TestScreen
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 
@@ -43,7 +39,11 @@ fun ComposeNavigation(
 //        }
         composable(Screen.TestScreen.route) {
             val glossaryId = it.arguments?.getString(NavArgument.GlossaryId.name)
-            TestScreen(glossaryName = glossaryId.orEmpty(), viewModel = viewModel)
+            TestScreen(glossaryName = glossaryId.orEmpty(),
+                viewModel = viewModel,
+                navigateToMainScreen = {
+                    navController.navigate(Screen.FirstScreen.route) }
+                )
         }
     }
 }

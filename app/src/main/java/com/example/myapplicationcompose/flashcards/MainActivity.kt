@@ -12,13 +12,9 @@ import com.example.myapplicationcompose.flashcards.data.AddingFileUiData
 import com.example.myapplicationcompose.flashcards.data.Glossary
 import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
 import com.example.myapplicationcompose.flashcards.navigation.ComposeNavigation
-import com.example.myapplicationcompose.flashcards.screen.AddingFileScreen
-import com.example.myapplicationcompose.flashcards.screen.FirstScreen
-import com.example.myapplicationcompose.flashcards.screen.GlossaryScreen
 import com.example.myapplicationcompose.flashcards.viewModel.Factory
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 import com.example.myapplicationcompose.ui.theme.MyApplicationComposeTheme
-import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
 

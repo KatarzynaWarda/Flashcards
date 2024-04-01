@@ -1,4 +1,4 @@
-package com.example.myapplicationcompose.flashcards.screen
+package com.example.myapplicationcompose.flashcards.screen.addingFileScreen
 
 import  androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,9 +25,8 @@ import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 
 @Composable
 fun GlossaryScreen(
-    viewModel: FlashcardsViewModel,
+    onEntryChange: (String, String) -> Unit
 ){
-
     var term by remember { mutableStateOf("") }
     var definition by remember { mutableStateOf("") }
 
@@ -50,4 +49,5 @@ fun GlossaryScreen(
             )
         }
     }
+    onEntryChange(term,definition)
 }
