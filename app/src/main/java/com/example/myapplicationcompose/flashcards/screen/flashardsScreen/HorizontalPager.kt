@@ -49,32 +49,16 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @Composable
-fun HorizontalPager(
+fun SwipeCard(
     onSwipeLeft: () -> Unit = {},
     onSwipeRight: () -> Unit = {},
     swipeThreshold: Float = 400f,
     sensitivityFactor: Float = 3f,
+    content: @Composable () -> Unit,
 ) {
     var offset by remember { mutableStateOf(0f) }
-    var dismissRight by remember { mutableStateOf(false) }
-    var dismissLeft by remember { mutableStateOf(false) }
+    var dismiss by remember { mutableStateOf(false) }
     val density = LocalDensity.current.density
-
-    LaunchedEffect(dismissRight) {
-        if (dismissRight) {
-            delay(300)
-            onSwipeRight.invoke()
-            dismissRight = false
-        }
-    }
-
-    LaunchedEffect(dismissLeft) {
-        if (dismissLeft) {
-            delay(300)
-            onSwipeLeft.invoke()
-            dismissLeft = false
-        }
-    }
 
     Box(modifier = Modifier
         .offset { IntOffset(offset.roundToInt(), 0) }
@@ -86,20 +70,22 @@ fun HorizontalPager(
                 offset += (dragAmount / density) * sensitivityFactor
                 when {
                     offset > swipeThreshold -> {
-                        dismissRight = true
+                        dismiss = true
+                        onSwipeLeft.invoke()
                     }
 
                     offset < -swipeThreshold -> {
-                        dismissLeft = true
+                        dismiss = true
+                        onSwipeRight.invoke()
                     }
                 }
                 if (change.positionChange() != Offset.Zero) change.consume()
             }
         }
         .graphicsLayer(
-            alpha = 10f - animateFloatAsState(if (dismissRight) 1f else 0f).value,
+            alpha = 10f - animateFloatAsState(if (dismiss) 1f else 0f).value,
             rotationZ = animateFloatAsState(offset / 50).value
         )) {
-
+        content()
     }
 }

@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplicationcompose.R
+import com.example.myapplicationcompose.flashcards.screen.flashardsScreen.SwipeCard
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 import kotlinx.coroutines.launch
 
@@ -110,25 +111,42 @@ fun TestScreen(
             HorizontalPager(
                 state = pagerState,
             ) { page ->
-                Column {
-                    Box(
-                        Modifier
-                            .defaultMinSize(minHeight = 400.dp)
-                            .fillMaxWidth()
-                            .background(colorResource(id = R.color.box), RoundedCornerShape(20.dp))
-                            .clickable {
-                                isTermDisplayed = !isTermDisplayed
-                            },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = if (isTermDisplayed) {
-                                viewModel.glossaries[index].entries[page].term
-                            } else {
-                                viewModel.glossaries[index].entries[page].definition
-                            },
-                            fontSize = 60.sp,
-                        )
+                SwipeCard(
+                    onSwipeLeft = {
+                        scope.launch {
+                            if (page < viewModel.glossaries[index].entries.size - 1) {
+                                pagerState.animateScrollToPage(page + 1)
+                            }
+                        }
+                    },
+                    onSwipeRight = {
+                        scope.launch {
+                            if (page < viewModel.glossaries[index].entries.size - 1) {
+                                pagerState.animateScrollToPage(page + 1)
+                            }
+                        }
+                    },
+                ) {
+                    Column {
+                        Box(
+                            Modifier
+                                .defaultMinSize(minHeight = 400.dp)
+                                .fillMaxWidth()
+                                .background(colorResource(id = R.color.box), RoundedCornerShape(20.dp))
+                                .clickable {
+                                    isTermDisplayed = !isTermDisplayed
+                                },
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = if (isTermDisplayed) {
+                                    viewModel.glossaries[index].entries[page].term
+                                } else {
+                                    viewModel.glossaries[index].entries[page].definition
+                                },
+                                fontSize = 60.sp,
+                            )
+                        }
                     }
                 }
             }

@@ -23,8 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplicationcompose.R
 import com.example.myapplicationcompose.flashcards.data.Glossary
-import com.example.myapplicationcompose.flashcards.screen.flashardsScreen.HorizontalPager
-
 @Composable
 fun FlashcardsScreen(
     glossary: Glossary,
