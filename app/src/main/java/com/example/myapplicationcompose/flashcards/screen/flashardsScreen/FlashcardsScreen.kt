@@ -64,7 +64,6 @@ fun FlashcardsScreen(
                 color = Color.Gray)
         }
         Spacer(modifier = Modifier.weight(1f))
-        HorizontalPager()
     }
 }
 

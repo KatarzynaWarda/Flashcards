@@ -1,9 +1,11 @@
 package com.example.myapplicationcompose.flashcards.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.myapplicationcompose.flashcards.screen.addingFileScreen.AddingFileScreen
 import com.example.myapplicationcompose.flashcards.screen.mainScreen.FirstScreen
 import com.example.myapplicationcompose.flashcards.screen.TestScreen
@@ -15,35 +17,41 @@ fun ComposeNavigation(
 ) {
 
     val navController = rememberNavController()
-    //val vm = viewModel<FlashcardsViewModel>()
 
     NavHost(navController = navController, startDestination = Screen.FirstScreen.route)
     {
         composable(Screen.FirstScreen.route) {
-         //   val glossaryName = remember { it.arguments?.getString(NavArgument.GlossaryName.name) }
             FirstScreen(
                 viewModel = viewModel,
                 navigateToAddingFileScreenAction = {
-                    navController.navigate(Screen.AddingFileScreen.route) }
+                    navController.navigate(Screen.AddingFileScreen.route) },
+                navigateToFlashcards = { index ->
+                    navController.navigate(Screen.TestScreen.createRoute(index))
+                }
             )
         }
         composable(Screen.AddingFileScreen.route) {
             AddingFileScreen(
                 viewModel = viewModel,
-                addFileOnClick = { glossaryId ->
-                    navController.navigate(Screen.TestScreen.createRoute(glossaryId)) }
-                    )
+                navigateToMainScreen = {
+                    navController.navigate(Screen.FirstScreen.route) }
+            )
         }
 //        composable(Screen.FlashcardsScreen.route) {
 //            FlashcardsScreen()
 //        }
-        composable(Screen.TestScreen.route) {
-            val glossaryId = it.arguments?.getString(NavArgument.GlossaryId.name)
-            TestScreen(glossaryName = glossaryId.orEmpty(),
+        composable(
+            Screen.TestScreen.route,
+            arguments = listOf(navArgument("index") { type = NavType.IntType }) ) {
+                backStackEntry ->
+            val index = backStackEntry.arguments?.getInt("index") ?: 0 // Domyślna wartość na wypadek braku argumentu
+
+            TestScreen(
                 viewModel = viewModel,
                 navigateToMainScreen = {
-                    navController.navigate(Screen.FirstScreen.route) }
-                )
+                    navController.navigate(Screen.FirstScreen.route) },
+                index = index
+            )
         }
     }
 }

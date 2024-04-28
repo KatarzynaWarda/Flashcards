@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import javax.inject.Inject
 
 class FlashcardsViewModel @Inject constructor(
@@ -27,50 +28,26 @@ class FlashcardsViewModel @Inject constructor(
     private val _glossaries = mutableStateListOf<Glossary>()
     val glossaries = _glossaries
 
-    private val _glossaryCount = mutableStateOf(0)
+    private val _glossaryCount = mutableIntStateOf(0)
     val glossaryCount: State<Int> = _glossaryCount
-
-    fun updateGlossaryName(name: String){
-        val currentName = _glossary.value
-        _glossary.value = currentName.copy(name = name)
-    }
 
     fun updateGlossaryEntry(
         term: String,
-        definition: String
+        definition: String,
     ) {
         if (term.isNotEmpty() && definition.isNotEmpty()) {
             _glossaryEntry.add(GlossaryEntry(term, definition))
         }
     }
 
-    fun updateGlossary() {
-        if (_glossaryEntry.isNotEmpty()) {
-            _glossary.value = Glossary(_glossary.value.name, _glossaryEntry)
-            _glossaries.add(_glossary.value)
-            _glossaryCount.value = _glossaries.size
+    fun updateGlossary(name: String) {
+        if (_glossaryEntry.isNotEmpty()  && name.isNotBlank()) {
+            val newGlossary = Glossary(name, _glossaryEntry.toList()) // Tworzenie nowego obiektu Glossary
+            _glossary.value = newGlossary // Aktualizacja wartości _glossary
+            _glossaries.add(newGlossary) // Dodanie do listy _glossaries
+            _glossaryCount.intValue = _glossaries.size // Aktualizacja liczby glosariuszy
+            _glossaryEntry.clear()
         }
-    }
-
-    fun fromFirstScreenToAddingFileScreen(navigateToAddingFileScreenAction: () -> Unit){
-        navigateToAddingFileScreenAction
-    }
-
-    fun fromLastToFirst(navigateToMainScreen: () -> Unit){
-        navigateToMainScreen
-    }
-
-    fun addFileOnClick(navigateToFlashcardsScreenAction: (String) -> Unit){
-        navigateToFlashcardsScreenAction(_glossary.value.name)
-    }
-
-    fun getGlossaryByName(name: String): Flow<Glossary?> {
-        return _glossary
-            .filterNotNull()
-            .map { glossary ->
-                if (glossary.name == name) glossary else null
-            }
-
     }
 }
 

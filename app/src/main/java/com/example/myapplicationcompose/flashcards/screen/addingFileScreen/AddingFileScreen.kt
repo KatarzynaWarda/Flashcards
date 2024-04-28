@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,11 +41,12 @@ import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 @Composable
 fun AddingFileScreen(
     viewModel: FlashcardsViewModel,
-    addFileOnClick : (String) -> Unit,
+    navigateToMainScreen: () -> Unit,
 ) {
     val glossary by viewModel.glossary.collectAsState()
     val entriesDraft = remember { mutableStateListOf<GlossaryEntry>() }
     val itemsCount = remember { mutableStateOf(1) }
+    var name by remember { mutableStateOf("") }
 
     while (entriesDraft.size < itemsCount.value) {
         entriesDraft.add(GlossaryEntry("", ""))
@@ -58,10 +60,8 @@ fun AddingFileScreen(
     ) {
         Column {
             TextField(
-                value = glossary.name,
-                onValueChange = { newName ->
-                    viewModel.updateGlossaryName(newName)
-                },
+                value = name,
+                onValueChange = { name = it},
                 label = { Text("Nazwa") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,9 +84,10 @@ fun AddingFileScreen(
                 entriesDraft.forEach { draft ->
                     viewModel.updateGlossaryEntry(draft.term, draft.definition)
                 }
-                viewModel.updateGlossary()
-                viewModel.glossaries.add(glossary)
-                addFileOnClick(glossary.name) },
+                viewModel.updateGlossary(name)
+                navigateToMainScreen()
+                entriesDraft.clear()
+                      },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(80.dp)
@@ -110,7 +111,6 @@ fun AddingFileScreen(
             itemsCount.value = entriesDraft.size + 1
         }
     }
-
 }
 
 
