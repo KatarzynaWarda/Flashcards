@@ -8,7 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.myapplicationcompose.flashcards.screen.addingFileScreen.AddingFileScreen
 import com.example.myapplicationcompose.flashcards.screen.mainScreen.FirstScreen
-import com.example.myapplicationcompose.flashcards.screen.TestScreen
+import com.example.myapplicationcompose.flashcards.screen.flashardsScreen.FlashCardsScreen
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 
 @Composable
@@ -46,7 +46,7 @@ fun ComposeNavigation(
                 backStackEntry ->
             val index = backStackEntry.arguments?.getInt("index") ?: 0 // Domyślna wartość na wypadek braku argumentu
 
-            TestScreen(
+            FlashCardsScreen(
                 viewModel = viewModel,
                 navigateToMainScreen = {
                     navController.navigate(Screen.FirstScreen.route) },
