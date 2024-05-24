@@ -1,23 +1,19 @@
 package com.example.myapplicationcompose.flashcards.viewModel
 
 import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.example.myapplicationcompose.flashcards.data.Glossary
-import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.myapplicationcompose.flashcards.data.Glossary
 import com.example.myapplicationcompose.flashcards.data.GlossaryDao
-import kotlinx.coroutines.Dispatchers
+import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 class FlashcardsViewModel @Inject constructor(
     private val glossaryDao: GlossaryDao
