@@ -7,15 +7,14 @@ sealed class Screen(val route: String) {
     object FirstScreen : Screen("first_screen/{glossaryName}") {
         fun createRoute(glossaryName: String) = "first_screen/$glossaryName"
     }
-
     object AddingFileScreen : Screen("adding_file_screen")
 
-    object FlashcardsScreen : Screen("flashcards_screen/{glossaryId}") {
-        fun createRoute(glossaryId: String) = "flashcards_screen/$glossaryId"
+    object AddingFileScreenWithId : Screen("adding_file_screen/{glossaryId}") {
+        fun createRoute(glossaryId: Int) = "adding_file_screen/$glossaryId"
     }
 
-    object TestScreen : Screen("test_screen/{index}") {
-        fun createRoute(index: Int) = "test_screen/$index"
+    object FlashcardsScreen : Screen("flashcards_screen/{glossaryId}") {
+        fun createRoute(glossaryId: Int) = "flashcards_screen/$glossaryId"
     }
 
 }

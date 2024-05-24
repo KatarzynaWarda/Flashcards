@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.myapplicationcompose.flashcards.data.AddingFileUiData
-import com.example.myapplicationcompose.flashcards.data.Glossary
-import com.example.myapplicationcompose.flashcards.data.GlossaryEntry
+import androidx.room.Room
+import com.example.myapplicationcompose.flashcards.data.GlossaryDao
+import com.example.myapplicationcompose.flashcards.data.GlossaryDatabase
 import com.example.myapplicationcompose.flashcards.navigation.ComposeNavigation
 import com.example.myapplicationcompose.flashcards.viewModel.Factory
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
@@ -18,12 +18,17 @@ import com.example.myapplicationcompose.ui.theme.MyApplicationComposeTheme
 
 class MainActivity : ComponentActivity() {
 
+    private lateinit var database: GlossaryDatabase
+    private lateinit var glossaryDao: GlossaryDao
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        database = Room.databaseBuilder(applicationContext, GlossaryDatabase::class.java, "my_database")
+            .build()
 
-        val addingFileUiData = AddingFileUiData(glossaryEntry = GlossaryEntry("",""), glossary = Glossary("", listOf()))
+        glossaryDao = database.glossaryDao()
 
-        val factory = Factory(addingFileUiData)
+        val factory = Factory(glossaryDao)
         val vm: FlashcardsViewModel by viewModels { factory }
 
         setContent {

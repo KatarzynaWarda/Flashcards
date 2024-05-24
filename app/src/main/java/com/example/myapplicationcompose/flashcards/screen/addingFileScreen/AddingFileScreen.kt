@@ -42,15 +42,16 @@ import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 fun AddingFileScreen(
     viewModel: FlashcardsViewModel,
     navigateToMainScreen: () -> Unit,
+    glossaryId: Int?,
 ) {
-    val glossary by viewModel.glossary.collectAsState()
     val entriesDraft = remember { mutableStateListOf<GlossaryEntry>() }
     val itemsCount = remember { mutableStateOf(1) }
     var name by remember { mutableStateOf("") }
 
     while (entriesDraft.size < itemsCount.value) {
-        entriesDraft.add(GlossaryEntry("", ""))
+        entriesDraft.add(GlossaryEntry(term = "", definition = "", glossaryId = glossaryId ?: 0))
     }
+
 
     Box(
         modifier = Modifier
@@ -81,13 +82,13 @@ fun AddingFileScreen(
         }
         IconButton(
             onClick = {
-                entriesDraft.forEach { draft ->
-                    viewModel.updateGlossaryEntry(draft.term, draft.definition)
+                if (name.isNotBlank()) {
+                    viewModel.updateGlossary(name, entriesDraft) {
+                        navigateToMainScreen()
+                        entriesDraft.clear()
+                    }
                 }
-                viewModel.updateGlossary(name)
-                navigateToMainScreen()
-                entriesDraft.clear()
-                      },
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .size(80.dp)
@@ -112,10 +113,3 @@ fun AddingFileScreen(
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun PreviewAddingFileScreen(){
-//    AddingFileScreen()
-//}

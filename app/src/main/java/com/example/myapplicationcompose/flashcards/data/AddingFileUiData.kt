@@ -1,10 +1,18 @@
 package com.example.myapplicationcompose.flashcards.data
 
-data class AddingFileUiData(
-    val glossaryEntry : GlossaryEntry,
-    val glossary: Glossary,
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "glossary")
+data class Glossary(
+        @PrimaryKey(autoGenerate = true) val id: Int = 0,
+        val name: String
 )
 
-data class GlossaryEntry(var term: String, var definition: String)
-
-data class Glossary(val name: String, val entries: List<GlossaryEntry>)
+@Entity(tableName = "glossary_entry")
+data class GlossaryEntry (
+        @PrimaryKey(autoGenerate = true) val id: Int = 0,
+        var term: String,
+        var definition: String,
+        var glossaryId: Int
+)

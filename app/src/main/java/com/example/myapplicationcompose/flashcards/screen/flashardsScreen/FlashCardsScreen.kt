@@ -1,5 +1,6 @@
 package com.example.myapplicationcompose.flashcards.screen.flashardsScreen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,112 +42,131 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplicationcompose.R
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FlashCardsScreen(
-        viewModel: FlashcardsViewModel,
-        navigateToMainScreen: () -> Unit,
-        index: Int,
+    viewModel: FlashcardsViewModel,
+    navigateToMainScreen: () -> Unit,
+    glossaryId: Int,
 ) {
     var buttonEnabled by remember { mutableStateOf(true) }
     var isTermDisplayed by remember { mutableStateOf(true) }
 
+    LaunchedEffect(glossaryId) {
+        viewModel.loadEntriesForGlossary(glossaryId)
+        Log.d("FlashcardsIdl",glossaryId.toString())
+
+    }
+
+    val entriesForGlossary by viewModel.entriesForGlossary.collectAsState()
+
+    LaunchedEffect(entriesForGlossary) {
+        entriesForGlossary.forEach { entry ->
+            Log.d("FlashcardsEntries", "Term: ${entry.term}, Definition: ${entry.definition}, Glossary ID: ${entry.glossaryId}")
+        }
+    }
+
+    val glossary = viewModel.getGlossaryById(glossaryId)
+
     val pagerState = rememberPagerState(
-            initialPage = 0,
-            initialPageOffsetFraction = 0f
-    ) { viewModel.glossaries[index].entries.size }
+        initialPage = 0,
+        initialPageOffsetFraction = 0f
+    ) { entriesForGlossary.size }
 
     Box(
-            modifier = Modifier
-                    .fillMaxSize()
-                    .background(colorResource(id = R.color.background))
-                    .padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 10.dp)
-                    .testTag("container")
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorResource(id = R.color.background))
+            .padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 10.dp)
+            .testTag("container")
     ) {
         Column {
             IconButton(
-                    onClick = {
-                        navigateToMainScreen()
-                    },
-                    modifier = Modifier.align(Alignment.End)
+                onClick = {
+                    navigateToMainScreen()
+                },
+                modifier = Modifier.align(Alignment.End)
             ) {
                 Image(
-                        painter = painterResource(id = R.drawable.icons8_close_60),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(Color.DarkGray),
+                    painter = painterResource(id = R.drawable.icons8_close_60),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.DarkGray),
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            Text(
-                    text = viewModel.glossaries[index].name,
+            glossary?.let {
+                Text(
+                    text = it.name,
                     fontSize = 35.sp,
                     fontWeight = FontWeight.Bold
-            )
+                )
+            }
             Row(
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
             ) {
                 Text(
-                        text = (viewModel.bad()).toString(),
-                        fontSize = 40.sp,
-                        color = Color.Gray
+                    text = (viewModel.bad()).toString(),
+                    fontSize = 40.sp,
+                    color = Color.Gray
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                        text = (viewModel.summary()).toString() + " / " + viewModel.glossaries[index].entries.size.toString(),
-                        fontSize = 40.sp,
-                        color = Color.Gray
+                    text = (viewModel.summary()).toString() + " / " + entriesForGlossary.size.toString(),
+                    fontSize = 40.sp,
+                    color = Color.Gray
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                        text = (viewModel.good()).toString(),
-                        fontSize = 40.sp,
-                        color = Color.Gray
+                    text = (viewModel.good()).toString(),
+                    fontSize = 40.sp,
+                    color = Color.Gray
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
 
             val scope = rememberCoroutineScope()
             HorizontalPager(
-                    state = pagerState,
+                state = pagerState,
             ) { page ->
                 SwipeCard(
-                        onSwipe = { swipeLeft ->
-                            scope.launch {
-                                if (page < viewModel.glossaries[index].entries.size - 1) {
-                                    pagerState.animateScrollToPage(page + 1)
-                                    if (swipeLeft) {
-                                        viewModel.incrementBad()
-                                    } else {
-                                        viewModel.incrementGood()
-                                    }
+                    onSwipe = { swipeLeft ->
+                        scope.launch {
+                            if (page < entriesForGlossary.size - 1) {
+                                pagerState.animateScrollToPage(page + 1)
+                                if (swipeLeft) {
+                                    viewModel.incrementBad()
+                                } else {
+                                    viewModel.incrementGood()
                                 }
                             }
-                        },
+                        }
+                    },
                 ) {
                     Column {
                         Box(
-                                Modifier
-                                        .defaultMinSize(minHeight = 400.dp)
-                                        .fillMaxWidth()
-                                        .background(
-                                                colorResource(id = R.color.box),
-                                                RoundedCornerShape(20.dp)
-                                        )
-                                        .clickable {
-                                            isTermDisplayed = !isTermDisplayed
-                                        },
-                                contentAlignment = Alignment.Center,
+                            Modifier
+                                .defaultMinSize(minHeight = 400.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    colorResource(id = R.color.box),
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .clickable {
+                                    isTermDisplayed = !isTermDisplayed
+                                },
+                            contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                    text = if (isTermDisplayed) {
-                                        viewModel.glossaries[index].entries[page].term
-                                    } else {
-                                        viewModel.glossaries[index].entries[page].definition
-                                    },
-                                    fontSize = 60.sp,
+                                text = if (isTermDisplayed) {
+                                    entriesForGlossary.getOrNull(page)?.term ?: ""
+                                } else {
+                                    entriesForGlossary.getOrNull(page)?.definition ?: ""
+                                },
+                                fontSize = 60.sp,
                             )
                         }
                     }
@@ -153,64 +174,64 @@ fun FlashCardsScreen(
             }
             Spacer(modifier = Modifier.weight(1f))
             Row(
-                    modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
             ) {
                 IconButton(
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                viewModel.incrementBad()
-                            }
-                            isTermDisplayed = true
-                            if (pagerState.currentPage == viewModel.glossaries[index].entries.size - 1) {
-                                buttonEnabled = false
-                            }
-                        },
-                        enabled = buttonEnabled,
-                        modifier = Modifier
-                                .size(80.dp)
-                                .background(Color.DarkGray, RoundedCornerShape(100.dp))
-                                .border(
-                                        BorderStroke(2.dp, colorResource(id = R.color.red)),
-                                        RoundedCornerShape(100.dp)
-                                ),
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            viewModel.incrementBad()
+                        }
+                        isTermDisplayed = true
+                        if (pagerState.currentPage == entriesForGlossary.size - 1) {
+                            buttonEnabled = false
+                        }
+                    },
+                    enabled = buttonEnabled,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(100.dp))
+                        .border(
+                            BorderStroke(2.dp, colorResource(id = R.color.red)),
+                            RoundedCornerShape(100.dp)
+                        ),
                 ) {
                     Image(
-                            painter = painterResource(id = R.drawable.icons8_close_60),
-                            contentDescription = null,
-                            modifier = Modifier
-                                    .size(40.dp),
-                            colorFilter = ColorFilter.tint(colorResource(id = R.color.red))
+                        painter = painterResource(id = R.drawable.icons8_close_60),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(40.dp),
+                        colorFilter = ColorFilter.tint(colorResource(id = R.color.red))
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                                viewModel.incrementGood()
-                            }
-                            isTermDisplayed = true
-                            if (pagerState.currentPage == viewModel.glossaries[index].entries.size - 1) {
-                                buttonEnabled = false
-                            }
-                        },
-                        enabled = buttonEnabled,
-                        modifier = Modifier
-                                .size(80.dp)
-                                .background(Color.DarkGray, RoundedCornerShape(100.dp))
-                                .border(
-                                        BorderStroke(2.dp, colorResource(id = R.color.green)),
-                                        RoundedCornerShape(100.dp)
-                                ),
+                    onClick = {
+                        scope.launch {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            viewModel.incrementGood()
+                        }
+                        isTermDisplayed = true
+                        if (pagerState.currentPage == entriesForGlossary.size - 1) {
+                            buttonEnabled = false
+                        }
+                    },
+                    enabled = buttonEnabled,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(Color.DarkGray, RoundedCornerShape(100.dp))
+                        .border(
+                            BorderStroke(2.dp, colorResource(id = R.color.green)),
+                            RoundedCornerShape(100.dp)
+                        ),
                 ) {
                     Image(
-                            painter = painterResource(id = R.drawable.icons8_done_52),
-                            contentDescription = null,
-                            modifier = Modifier.size(40.dp),
-                            colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
+                        painter = painterResource(id = R.drawable.icons8_done_52),
+                        contentDescription = null,
+                        modifier = Modifier.size(40.dp),
+                        colorFilter = ColorFilter.tint(colorResource(id = R.color.green))
                     )
                 }
             }
