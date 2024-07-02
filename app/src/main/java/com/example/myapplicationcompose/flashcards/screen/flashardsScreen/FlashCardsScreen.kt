@@ -1,11 +1,9 @@
 package com.example.myapplicationcompose.flashcards.screen.flashardsScreen
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,7 +76,7 @@ fun FlashCardsScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(colorResource(id = R.color.background))
+            .background(Color.DarkGray)
             .padding(top = 20.dp, start = 30.dp, end = 30.dp, bottom = 10.dp)
             .testTag("container")
     ) {
@@ -92,7 +90,7 @@ fun FlashCardsScreen(
                 Image(
                     painter = painterResource(id = R.drawable.icons8_close_60),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(Color.DarkGray),
+                    colorFilter = ColorFilter.tint(Color.Black),
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -192,11 +190,6 @@ fun FlashCardsScreen(
                     enabled = buttonEnabled,
                     modifier = Modifier
                         .size(80.dp)
-                        .background(Color.DarkGray, RoundedCornerShape(100.dp))
-                        .border(
-                            BorderStroke(2.dp, colorResource(id = R.color.red)),
-                            RoundedCornerShape(100.dp)
-                        ),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icons8_close_60),
@@ -221,11 +214,6 @@ fun FlashCardsScreen(
                     enabled = buttonEnabled,
                     modifier = Modifier
                         .size(80.dp)
-                        .background(Color.DarkGray, RoundedCornerShape(100.dp))
-                        .border(
-                            BorderStroke(2.dp, colorResource(id = R.color.green)),
-                            RoundedCornerShape(100.dp)
-                        ),
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icons8_done_52),
