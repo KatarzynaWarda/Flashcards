@@ -51,18 +51,6 @@ class FlashcardsViewModel @Inject constructor(
         }
     }
 
-    fun updateGlossaryEntry(glossaryId: Int, term: String, definition: String) {
-        if (term.isNotEmpty() && definition.isNotEmpty()) {
-            viewModelScope.launch {
-                glossaryDao.insertGlossaryEntry(GlossaryEntry(
-                    term = term,
-                    definition = definition,
-                    glossaryId = glossaryId
-                ))
-            }
-        }
-    }
-
     fun updateGlossary(name: String, entries: List<GlossaryEntry>, onGlossaryCreated: (Int) -> Unit) {
         if (entries.isNotEmpty() && name.isNotBlank()) {
             viewModelScope.launch {

@@ -1,6 +1,7 @@
 package com.example.myapplicationcompose.flashcards
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -16,12 +17,15 @@ import com.example.myapplicationcompose.flashcards.viewModel.Factory
 import com.example.myapplicationcompose.flashcards.viewModel.FlashcardsViewModel
 import com.example.myapplicationcompose.ui.theme.MyApplicationComposeTheme
 
+
 class MainActivity : ComponentActivity() {
 
     private lateinit var database: GlossaryDatabase
     private lateinit var glossaryDao: GlossaryDao
+    private val startTime = System.currentTimeMillis()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("LaunchTime", "App start time: $startTime")
         super.onCreate(savedInstanceState)
         database = Room.databaseBuilder(applicationContext, GlossaryDatabase::class.java, "my_database")
             .build()
@@ -38,6 +42,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val endTime = System.currentTimeMillis()
+        Log.d("LaunchTime", "App ready time: $endTime")
+        Log.d("LaunchTime", ("Launch time: " + (endTime - startTime)) + " ms")
     }
 }
 
